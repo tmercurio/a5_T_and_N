@@ -139,6 +139,7 @@ UPROGS=\
 	$U/_launch\
 	$U/_zombie\
 	$U/_game\
+	$U/_dumppt\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
