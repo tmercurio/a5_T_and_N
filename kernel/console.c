@@ -21,6 +21,8 @@
 #include "riscv.h"
 #include "defs.h"
 #include "proc.h"
+#include "console.h"
+#include "ioctl.h"
 
 #define BACKSPACE 0x100
 #define C(x)  ((x)-'@')  // Control-x
@@ -178,6 +180,14 @@ consoleintr(int c)
   release(&cons.lock);
 }
 
+
+int 
+consoleioctl(int user_dst, uint64 dst, int request)
+{
+  int res = -1;
+  return res;
+}	
+
 void
 consoleinit(void)
 {
@@ -189,4 +199,5 @@ consoleinit(void)
   // to consoleread and consolewrite.
   devsw[CONSOLE].read = consoleread;
   devsw[CONSOLE].write = consolewrite;
+  devsw[CONSOLE].ioctl = consoleioctl;
 }

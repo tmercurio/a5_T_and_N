@@ -89,3 +89,29 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+extern pagetable_t kernel_pagetable;
+extern struct proc proc[NPROC];
+
+uint64
+sys_dumppt(void)
+{
+  int pid;
+
+  argint(0,&pid);
+  if (pid==0)
+  {
+    vmprint(kernel_pagetable);
+    return 0;
+  }
+  else if ((pid>0) && (pid<NPROC) && (proc[pid].state != UNUSED))
+  {
+    acquire(&(proc[pid].lock));
+    vmprint(proc[pid].pagetable);
+    release(&(proc[pid].lock));
+    return 0;
+  } else
+  {
+    return -1;
+  }
+}

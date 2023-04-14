@@ -20,3 +20,9 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
+#define SYS_ioctl  23
+#define SYS_dumppt 24
+#define SYS_sem_open 25
+#define SYS_sem_post 26
+#define SYS_sem_wait 27
+#define SYS_sem_close 28

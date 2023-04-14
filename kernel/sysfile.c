@@ -503,3 +503,22 @@ sys_pipe(void)
   }
   return 0;
 }
+
+uint64
+sys_ioctl(void)
+{
+  struct file *f;
+  int fd;
+  int request;
+  int data;
+
+  if (argfd(0,&fd,&f) < 0) {
+    return -1;
+  }
+
+  argint(1, &request);
+  argint(2, &data);
+
+  return ioctl(f,request,data);
+}
+

@@ -180,3 +180,13 @@ filewrite(struct file *f, uint64 addr, int n)
   return ret;
 }
 
+int ioctl(struct file *f, uint64 request, uint64 data)
+{
+   int ret = -1;
+
+   if (f->type == FD_DEVICE){
+      ret = devsw[f->major].ioctl(1,data,request);
+   }
+
+   return ret;
+}

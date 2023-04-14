@@ -286,6 +286,52 @@ freewalk(pagetable_t pagetable)
   kfree((void*)pagetable);
 }
 
+// print all entries in the specified page table
+static void
+vmprint_helper(const char *prefix, uint64 base_va, pagetable_t pagetable)
+{
+  char pref[10];
+  int l;
+
+  strncpy(pref,prefix,10);
+  l = strlen(pref);
+  pref[l]=' ';
+  pref[l+1]='.';
+  pref[l+2]='.';
+  pref[l+3]='\0';
+
+  if (l == 0) {
+    printf("page table at physical address (pa) %p\n", pagetable);
+    vmprint_helper((const char*)pref,base_va,pagetable);
+  }
+  else
+  {
+    // there are 2^9 = 512 PTEs in a page table.
+    for(int i = 0; i < 512; i++){
+      pte_t pte = pagetable[i];
+      if(pte & PTE_V) {
+        uint64 pa = PTE2PA(pte);
+        if((pte & (PTE_R|PTE_W|PTE_X)) == 0){
+          // this PTE points to a lower-level page table.
+          printf("%s%d: pte points to lower-level page table: pte %p -> pa %p\n",prefix,i,pte,pa);
+          vmprint_helper((const char *)pref, (base_va << 9) | i, (pagetable_t)pa);
+        } else {
+          // leaf PTE
+          uint64 va=((base_va << 9)| i) <<12;
+          printf("%s%d: leaf pte: va %p-%p -> pa %p-%p\n",prefix,i,va,va+PGSIZE-1,pa,pa+PGSIZE-1);
+        }
+      }
+    }
+  }
+}
+
+void
+vmprint(pagetable_t pagetable)
+{
+  vmprint_helper("",0,pagetable);
+}
+
+
 // Free user memory pages,
 // then free page-table pages.
 void
@@ -331,6 +377,39 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
+
+// Given a parent process's page table,
+// share its mappings starting from 
+// virtual address va for sz bytes
+// into a child's page table.
+// Copies the relevant page table entries only 
+// shares the same physical memory.
+// returns 0 on success, -1 on failure.
+int
+uvmshare(pagetable_t old, pagetable_t new, uint64 startva, uint64 sz)
+{
+  pte_t *pte;
+  uint64 pa, i, endva;
+  uint flags;
+
+  for(i = startva, endva = startva+sz; i < endva; i += PGSIZE){
+    if((pte = walk(old, i, 0)) == 0)
+      panic("uvmshare: pte should exist");
+    if((*pte & PTE_V) == 0)
+      panic("uvmshare: page not present");
+    pa = PTE2PA(*pte);
+    flags = PTE_FLAGS(*pte);
+    if(mappages(new, i, PGSIZE, pa, flags) != 0){
+      goto err;
+    }
+  }
+  return 0;
+
+ err:
+  uvmunmap(new, startva, (i - startva) / PGSIZE, 0);
+  return -1;
+}
+
 
 // mark a PTE invalid for user access.
 // used by exec for the user stack guard page.

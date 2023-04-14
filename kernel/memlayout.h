@@ -62,6 +62,10 @@
 //   fixed-size stack
 //   expandable heap
 //   ...
+//   SHAREDMEM (single memory page R/W shared by all processes
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
+
+#define SHAREDMEM (TRAMPOLINE - (2*(PGSIZE)))
+

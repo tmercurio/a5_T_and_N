@@ -20,6 +20,8 @@ static void freeproc(struct proc *p);
 
 extern char trampoline[]; // trampoline.S
 
+char *sharedmem; // pointer to the globally unique physical address of the shared memory page
+
 // helps ensure that wakeups of wait()ing
 // parents are not lost. helps obey the
 // memory model when using p->parent.
@@ -56,6 +58,9 @@ procinit(void)
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
   }
+  sharedmem = kalloc();
+  if (sharedmem == 0) 
+     panic("cannot allocate shared memory page");
 }
 
 // Must be called with interrupts disabled,
@@ -202,6 +207,16 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+  // map the shared memory page below the trapframe page and make it user-accessible
+  if(mappages(pagetable, SHAREDMEM, PGSIZE,
+              (uint64)sharedmem, PTE_R | PTE_W | PTE_U) < 0){
+    uvmunmap(pagetable, TRAMPOLINE, 1, 0);
+    uvmunmap(pagetable, TRAPFRAME, 1, 0);
+    uvmfree(pagetable, 0);
+    return 0;
+  }
+
+
   return pagetable;
 }
 
@@ -210,6 +225,7 @@ proc_pagetable(struct proc *p)
 void
 proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
+  uvmunmap(pagetable, SHAREDMEM, 1, 0);	
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
   uvmfree(pagetable, sz);
@@ -681,3 +697,4 @@ procdump(void)
     printf("\n");
   }
 }
+

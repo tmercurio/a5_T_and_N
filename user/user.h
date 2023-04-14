@@ -22,6 +22,12 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int ioctl(int fd, int cmd, ...);
+int dumppt(int); // argument is either PID or 0, the latter prints kernel pagetable
+int sem_open(int, unsigned int);
+int sem_post(int, unsigned int);
+int sem_wait(int, unsigned int);
+int sem_close(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
