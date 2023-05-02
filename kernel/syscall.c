@@ -139,7 +139,6 @@ static uint64 (*syscalls[])(void) = {
 [SYS_sem_post] sys_sem_post,
 [SYS_sem_wait] sys_sem_wait,
 [SYS_sem_close] sys_sem_close,
-[SYS_interprocess] sys_interprocess,
 };
 
 void
