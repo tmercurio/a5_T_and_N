@@ -54,21 +54,21 @@ main(int argc, char *argv[])
     first_inode_block = block[24] | (block[25] << 8) | (block[26] << 16) | (block[27] << 24);
     first_free_map_block = block[28] | (block[29] << 8) | (block[30] << 16) | (block[31] << 24);
 
-    putchar("B"); // Boot block that is always first
-    putchar("S"); // Superblock that is always second
+    putchar('B'); // Boot block that is always first
+    putchar('S'); // Superblock that is always second
 
     for (i = 2; i < tot_blocks; i++) {
         if (i < first_inode_block)
-            putchar("L");
+            putchar('L');
         else if (i < first_free_map_block)
-            putchar("I");
+            putchar('I');
         else if (i < (tot_blocks - data_blocks))
-            putchar("T");
+            putchar('T');
         else
-            putchar("D");
+            putchar('D');
     }
 
-    putchar("\n");
+    putchar('\n');
 
     exit(0);
     //never gets here
