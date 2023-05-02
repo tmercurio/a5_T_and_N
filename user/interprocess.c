@@ -100,11 +100,11 @@ void worker(int sem)
 
    printf("In worker process\n");
 
+   sem_wait(sem, 1);
    for(i = get_item(); i>=0; i = get_item())
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
 
-    sem_wait(sem, 1);
 
 	// --------- do not modify the increment loop  --------
 	for (int j=0; j <100000; j++)
@@ -116,9 +116,9 @@ void worker(int sem)
 	// ---------------------------------------------------
 
 	s->a[i].processed = 1;
-    sem_post((sem + 1) % M, 1);
    }
 
+   sem_post((sem + 1) % M, 1);
    printf("Waiting to exit\n");
 
    exit(0);
