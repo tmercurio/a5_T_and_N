@@ -45,9 +45,9 @@ main(int argc, char *argv[])
 
     int tot_blocks = 0;
 
-    tot_blocks = block[4] | (block[5] << 2) | (block[6] << 4) | (block[7] << 6);
+    tot_blocks = block[4] | (block[5] << 8) | (block[6] << 16) | (block[7] << 24);
 
-    printf("Total blocks = %d", tot_blocks);
+    printf("Total blocks = %d\n", tot_blocks);
     // let's print the block data as a hexadecimal "dump" ;)
     for (i = 0; i < 64; i++)
     {
