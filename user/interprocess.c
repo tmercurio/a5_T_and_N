@@ -1,6 +1,7 @@
 #include "kernel/types.h"
 #include "kernel/riscv.h"
 #include "kernel/memlayout.h"
+#include "kernel/stat.h"
 #include "user/user.h"
 
 /* Assignment 5, question 3
