@@ -99,7 +99,7 @@ void worker(int sem)
    // Line added to protect data from being accessed by multiple processes
    //sem_wait(sem, 1);
 
-   for(i = get_item(); i>=0; i = get_item())
+   for(i = get_item(sem); i>=0; i = get_item(sem))
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
 
