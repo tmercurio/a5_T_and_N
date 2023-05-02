@@ -138,7 +138,9 @@ main(int argc, char *argv[])
   {
      if (fork() == 0) {
          sem_wait(i, 1);
+         printf("Process %d starting\n", i);
          worker(); // start worker process
+         printf("Process %d finished\n", i);
          sem_post((i + 1) % M, 1);
      }
   }
