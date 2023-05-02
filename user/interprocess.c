@@ -137,7 +137,7 @@ main(int argc, char *argv[])
   for (i = 0; i<M; i++)
   {
      if (fork() == 0) {
-         sem_wait(i, 1)
+         sem_wait(i, 1);
          worker(); // start worker process
          sem_post((i + 1) % M, 1);
      }
