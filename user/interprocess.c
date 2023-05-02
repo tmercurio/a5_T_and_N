@@ -110,8 +110,8 @@ void worker(int sem)
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
-       if (j == 99999)
-        printf("Value %d processed\n", i);
+       //if (j == 99999)
+        //printf("Value %d processed\n", i);
 	}
 	// ---------------------------------------------------
 
@@ -119,7 +119,7 @@ void worker(int sem)
    }
 
    sem_post((sem + 1) % M, 1);
-   printf("Waiting to exit\n");
+   //printf("Waiting to exit\n");
 
    exit(0);
 }
@@ -146,9 +146,9 @@ main(int argc, char *argv[])
   for (i = 0; i<M; i++)
   {
      if (fork() == 0) {
-         printf("Process %d starting\n", i);
+         //printf("Process %d starting\n", i);
          worker(i); // start worker process
-         printf("Process %d finished\n", i);
+         //printf("Process %d finished\n", i);
      }
   }
 
