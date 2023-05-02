@@ -63,17 +63,11 @@ struct shared_space {
   struct data a[N];  // array of N items
 };
 
-enum semaphores {
-  Sa = 0,
-  Sb = 1,
-  Sc = 2
-};
-
 // situate shared_space in the shared virtual memory page
 volatile struct shared_space *s = (volatile struct shared_space*) 0x3FFFFFD000;
 
 // This method gets the next piece of data to be processed
-int get_item()
+int get_item(int sem)
 {
    int i;
 
@@ -90,6 +84,8 @@ int get_item()
      i = -1;    // yes, return -1 in place of the item index
    }
 
+   sem_wait(sem, 1);
+
    return i;
 }
 
@@ -100,7 +96,9 @@ void worker(int sem)
 
    printf("In worker process\n");
 
-   sem_wait(sem, 1);
+   // Line added to protect data from being accessed by multiple processes
+   //sem_wait(sem, 1);
+
    for(i = get_item(); i>=0; i = get_item())
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
@@ -110,15 +108,16 @@ void worker(int sem)
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
-       //if (j == 99999)
-        //printf("Value %d processed\n", i);
+       if (j == 99999)
+        printf("Value %d processed\n", i);
 	}
 	// ---------------------------------------------------
 
 	s->a[i].processed = 1;
+    sem_post((sem + 1) % M, 1);
    }
 
-   sem_post((sem + 1) % M, 1);
+   //sem_post((sem + 1) % M, 1);
    //printf("Waiting to exit\n");
 
    exit(0);
@@ -137,6 +136,7 @@ main(int argc, char *argv[])
      s->a[i].processed = 0;
   }
 
+  // Lines added to open semaphores, with the first process getting priority
   sem_open(0, 1);
   sem_open(1, 0);
   sem_open(2, 0);
@@ -146,9 +146,9 @@ main(int argc, char *argv[])
   for (i = 0; i<M; i++)
   {
      if (fork() == 0) {
-         //printf("Process %d starting\n", i);
+         printf("Process %d starting\n", i);
          worker(i); // start worker process
-         //printf("Process %d finished\n", i);
+         printf("Process %d finished\n", i);
      }
   }
 
@@ -158,6 +158,7 @@ main(int argc, char *argv[])
      wait(0);
   }
 
+  // Closing semaphores at the end when they are not needed anymore
   sem_close(0);
   sem_close(1);
   sem_close(2);

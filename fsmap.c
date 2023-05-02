@@ -18,8 +18,8 @@ main(int argc, char *argv[])
 
     if (argc < 2)
     {
-	printf("Usage: fsmap path-to-fs.img\n");
-	exit(0);
+    	printf("Usage: fsmap path-to-fs.img\n");
+    	exit(0);
     }
 
     fd = open(argv[1],O_RDONLY);
