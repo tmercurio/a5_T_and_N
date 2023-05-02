@@ -62,6 +62,12 @@ struct shared_space {
   struct data a[N];  // array of N items
 };
 
+enum semaphores {
+  Sa = 0,
+  Sb = 1,
+  Sc = 2
+}
+
 // situate shared_space in the shared virtual memory page
 volatile struct shared_space *s = (volatile struct shared_space*) 0x3FFFFFD000;
 
@@ -121,11 +127,19 @@ main(int argc, char *argv[])
      s->a[i].processed = 0;
   }
 
+  sem_open(0, 1);
+  sem_open(1, 0);
+  sem_open(2, 0);
+
   // create worker processes
   printf("Creating worker processes ...\n");
   for (i = 0; i<M; i++)
   {
-     if (fork() == 0) worker(); // start worker process
+     if (fork() == 0) {
+         sem_wait(i, 1)
+         worker(); // start worker process
+         sem_post((i + 1) % M, 1);
+     }
   }
 
   // wait for the child processes to terminate
@@ -133,6 +147,10 @@ main(int argc, char *argv[])
   {
      wait(0);
   }
+
+  sem_close(0);
+  sem_close(1);
+  sem_close(2);
 
   // print out the processed array
   printf("Processed data in the array:\n");
