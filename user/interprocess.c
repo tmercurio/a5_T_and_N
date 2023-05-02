@@ -94,7 +94,7 @@ int get_item()
 }
 
 // worker process - keeps getting items from the array until there is no more
-void worker()
+void worker(int sem)
 {
    int i;
 
@@ -103,6 +103,8 @@ void worker()
    for(i = get_item(); i>=0; i = get_item())
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
+
+    sem_wait(sem, 1);
 
 	// --------- do not modify the increment loop  --------
 	for (int j=0; j <100000; j++)
@@ -113,6 +115,7 @@ void worker()
 	}
 	// ---------------------------------------------------
 
+    sem_post((sem + 1) % M, 1);
 	s->a[i].processed = 1;
    }
 
@@ -143,11 +146,9 @@ main(int argc, char *argv[])
   for (i = 0; i<M; i++)
   {
      if (fork() == 0) {
-         sem_wait(i, 1);
          printf("Process %d starting\n", i);
-         worker(); // start worker process
+         worker(i); // start worker process
          printf("Process %d finished\n", i);
-         sem_post((i + 1) % M, 1);
      }
   }
 
