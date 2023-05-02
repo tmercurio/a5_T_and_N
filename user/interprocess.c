@@ -69,6 +69,8 @@ volatile struct shared_space *s = (volatile struct shared_space*) 0x3FFFFFD000;
 // This method gets the next piece of data to be processed
 int get_item(int sem)
 {
+   sem_wait(sem, 1);
+
    int i;
 
    for (i = 0; i < N; i++)
@@ -83,8 +85,6 @@ int get_item(int sem)
    {
      i = -1;    // yes, return -1 in place of the item index
    }
-
-   sem_wait(sem, 1);
 
    return i;
 }
@@ -118,7 +118,7 @@ void worker(int sem)
    }
 
    //sem_post((sem + 1) % M, 1);
-   //printf("Waiting to exit\n");
+   printf("Waiting to exit\n");
 
    exit(0);
 }
