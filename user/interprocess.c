@@ -115,8 +115,8 @@ void worker(int sem)
 	}
 	// ---------------------------------------------------
 
-    sem_post((sem + 1) % M, 1);
 	s->a[i].processed = 1;
+    sem_post((sem + 1) % M, 1);
    }
 
    printf("Waiting to exit\n");
