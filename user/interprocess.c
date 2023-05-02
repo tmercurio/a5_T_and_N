@@ -108,7 +108,7 @@ void worker()
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
-       if (a % 100 == 0)
+       if (j % 100 == 0)
         printf("Incrementing value (%d)\n", j);
 	}
 	// ---------------------------------------------------
