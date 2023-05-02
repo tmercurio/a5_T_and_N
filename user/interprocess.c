@@ -108,13 +108,15 @@ void worker()
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
-       if (j % 10000 == 0)
-        printf("Incrementing value (%d)\n", j);
+       if (j == 99999)
+        printf("Value %d processed\n", i);
 	}
 	// ---------------------------------------------------
 
 	s->a[i].processed = 1;
    }
+
+   printf("Waiting to exit\n");
 
    exit(0);
 }
