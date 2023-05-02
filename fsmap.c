@@ -29,7 +29,7 @@ main(int argc, char *argv[])
 	    exit(-1);
     }
 
-    printf("map of %s\n", argv[1]);
+    printf("map of %s\n\n", argv[1]);
 
     blockNo = 1;  // Reading data from the first block
 
@@ -43,13 +43,34 @@ main(int argc, char *argv[])
         fprintf(stderr,"Cannot read the entire block %d\n",blockNo);
     }
 
-    int tot_blocks = 0;
+    int tot_blocks, data_blocks, num_inodes, num_log_blocks, first_log_block;
+    int first_inode_block, first_free_map_block;
 
     tot_blocks = block[4] | (block[5] << 8) | (block[6] << 16) | (block[7] << 24);
+    data_blocks = block[8] | (block[9] << 8) | (block[10] << 16) | (block[11] << 24);
+    num_inodes = block[12] | (block[13] << 8) | (block[14] << 16) | (block[15] << 24);
+    num_log_blocks = block[16] | (block[17] << 8) | (block[18] << 16) | (block[19] << 24);
+    first_log_block = block[20] | (block[21] << 8) | (block[22] << 16) | (block[23] << 24);
+    first_inode_block = block[24] | (block[25] << 8) | (block[26] << 16) | (block[27] << 24);
+    first_free_map_block = block[28] | (block[29] << 8) | (block[30] << 16) | (block[31] << 24);
 
-    printf("Total blocks = %d\n", tot_blocks);
+    printf("B"); // Boot block that is always first
+    printf("S"); // Superblock that is always second
+
+    for (i = 2; i < tot_blocks; i++) {
+        if (i < first_inode_block)
+            printf("L");
+        else if (i < first_free_map_block)
+            printf("I");
+        else if (i < (tot_blocks - data_blocks))
+            printf("T");
+        else
+            printf("D");
+    }
+
+    printf("\n");
     // let's print the block data as a hexadecimal "dump" ;)
-    for (i = 0; i < 64; i++)
+    for (i = 0; i < 3; i++)
     {
     	// print 16 bytes of data in decimal
     	for (j = 0; j < 16; j++)
