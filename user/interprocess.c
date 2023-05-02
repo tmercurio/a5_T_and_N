@@ -67,7 +67,7 @@ enum semaphores {
   Sa = 0,
   Sb = 1,
   Sc = 2
-}
+};
 
 // situate shared_space in the shared virtual memory page
 volatile struct shared_space *s = (volatile struct shared_space*) 0x3FFFFFD000;
