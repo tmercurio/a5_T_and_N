@@ -109,7 +109,7 @@ void worker(int sem)
 	{
 	   s->a[i].value++;
        if (j == 99999)
-        printf("Value %d processed\n", i);
+        printf("Value %d processed by process %d\n", i, sem);
 	}
 	// ---------------------------------------------------
 
