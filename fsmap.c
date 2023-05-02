@@ -29,7 +29,7 @@ main(int argc, char *argv[])
 	    exit(-1);
     }
 
-    printf("map of %s\n\n", argv[1]);
+    printf("map of %s:\n\n", argv[1]);
 
     blockNo = 1;  // Reading data from the first block
 
@@ -54,44 +54,22 @@ main(int argc, char *argv[])
     first_inode_block = block[24] | (block[25] << 8) | (block[26] << 16) | (block[27] << 24);
     first_free_map_block = block[28] | (block[29] << 8) | (block[30] << 16) | (block[31] << 24);
 
-    printf("B"); // Boot block that is always first
-    printf("S"); // Superblock that is always second
+    putchar("B"); // Boot block that is always first
+    putchar("S"); // Superblock that is always second
 
     for (i = 2; i < tot_blocks; i++) {
         if (i < first_inode_block)
-            printf("L");
+            putchar("L");
         else if (i < first_free_map_block)
-            printf("I");
+            putchar("I");
         else if (i < (tot_blocks - data_blocks))
-            printf("T");
+            putchar("T");
         else
-            printf("D");
+            putchar("D");
     }
 
-    printf("\n");
-    // let's print the block data as a hexadecimal "dump" ;)
-    for (i = 0; i < 3; i++)
-    {
-    	// print 16 bytes of data in decimal
-    	for (j = 0; j < 16; j++)
-    	{
-    	    printf("%x ", block[i * 16 + j]);
+    putchar("\n");
 
-    	    // print a separating ' ' after the first 8 bytes
-    	    if (j == 7) putchar(' ');
-    	}
-
-    	// print a few whitespaces separating hex from char section
-    	printf(" ");
-
-    	//print16 bytes of data as characters replacing unprintable chars with '.'
-    	for (j = 0; j<16; j++)
-    	{
-    	   c = ((block[i*16+j] >= ' ') && (block[i*16+j] <= '~')) ? block[i*16+j] : '.';
-    	   putchar(c);
-    	}
-    	putchar('\n');
-    }
     exit(0);
     //never gets here
 }
