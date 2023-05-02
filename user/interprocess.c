@@ -98,6 +98,8 @@ void worker()
 {
    int i;
 
+   printf("In worker process\n");
+
    for(i = get_item(); i>=0; i = get_item())
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
@@ -106,6 +108,7 @@ void worker()
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
+       printf("Incrementing value (%d)\n", j);
 	}
 	// ---------------------------------------------------
 
