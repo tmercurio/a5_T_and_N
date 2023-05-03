@@ -1,8 +1,14 @@
+/* 
+    Modified by Nikita Volkov (21393323)
+    Team: T&N
+*/
+
 #include "types.h"
 #include "param.h"
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "null.h"
 
 volatile static int started = 0;
 
@@ -30,6 +36,7 @@ main()
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
     userinit();      // first user process
+    null_init();     // null device
     __sync_synchronize();
     started = 1;
   } else {

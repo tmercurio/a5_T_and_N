@@ -1,3 +1,8 @@
+/*
+ * Modified by: Nikita Volkov (21393323)
+ * Team: T&N
+*/
+
 //
 // Console input and output, to the uart.
 // Reads are line at a time.
@@ -24,8 +29,17 @@
 #include "console.h"
 #include "ioctl.h"
 
+#define TIOCNONBLOCK 1
+#define TIOCBLOCK    2
+#define TIOCNOECHO   3
+#define TIOCECHO     4
+
+
 #define BACKSPACE 0x100
 #define C(x)  ((x)-'@')  // Control-x
+
+static int non_blocking_mode = 0;
+static int non_echoing_mode = 0;
 
 //
 // send one character to the uart.
@@ -39,6 +53,7 @@ consputc(int c)
     // if the user typed backspace, overwrite with a space.
     uartputc_sync('\b'); uartputc_sync(' '); uartputc_sync('\b');
   } else {
+    if (!non_echoing_mode)
     uartputc_sync(c);
   }
 }
@@ -167,11 +182,21 @@ consoleintr(int c)
       // store for consumption by consoleread().
       cons.buf[cons.e++ % INPUT_BUF_SIZE] = c;
 
-      if(c == '\n' || c == C('D') || cons.e-cons.r == INPUT_BUF_SIZE){
+      if(non_blocking_mode) 
+      {
+      cons.w = cons.e;
+       wakeup(&cons.r);
+      } 
+      else 
+      {
+
+        if(c == '\n' || c == C('D') || cons.e-cons.r == INPUT_BUF_SIZE)
+        {
         // wake up consoleread() if a whole line (or end-of-file)
         // has arrived.
         cons.w = cons.e;
         wakeup(&cons.r);
+       }
       }
     }
     break;
@@ -184,8 +209,23 @@ consoleintr(int c)
 int 
 consoleioctl(int user_dst, uint64 dst, int request)
 {
-  int res = -1;
-  return res;
+   switch (request) {
+    case TIOCNONBLOCK:
+      non_blocking_mode = 1;
+      break;
+    case TIOCBLOCK:
+      non_blocking_mode = 0;
+      break;
+    case TIOCNOECHO:
+      non_echoing_mode = 1;
+      break;
+    case TIOCECHO:
+      non_echoing_mode = 0;
+      break;
+    default:
+      return -1;
+  }
+  return 0;
 }	
 
 void

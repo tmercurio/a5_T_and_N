@@ -1,6 +1,13 @@
+/*
+*  modified by: Nikita Volkov (21393323)
+*  team: T&N
+*/
+
 //
 // Support functions for system calls that involve file descriptors.
 //
+
+
 
 #include "types.h"
 #include "riscv.h"
@@ -189,4 +196,12 @@ int ioctl(struct file *f, uint64 request, uint64 data)
    }
 
    return ret;
+}
+
+int
+fileioctl(struct file *f, int cmd)
+{
+  if(f->type == FD_INODE && f->ip->type == T_DEVICE && f->ip->major == CONSOLE)
+    return consoleioctl(0, 0, cmd);
+  return -1;
 }

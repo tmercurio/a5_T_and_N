@@ -1,3 +1,9 @@
+/*
+*   Modified by Nikita Volkov (21393323)
+*   Team: T&N
+*/
+
+
 #include "kernel/types.h"
 #include "kernel/stat.h"
 #include "kernel/console.h"
@@ -8,6 +14,11 @@
 #define NCOLS (80)
 #define NROWS (24)
 
+#define TIOCNONBLOCK 1
+#define TIOCBLOCK    2
+#define TIOCNOECHO   3
+#define TIOCECHO     4
+
 int
 main(int argc, char *argv[])
 {
@@ -17,14 +28,16 @@ main(int argc, char *argv[])
   int dy=0,dx=1;
 
   /* set console into non-blocking non-echoing mode */
-  ioctl(0, _IO(CONSOLE_SETFL, CONSOLE_FL_NONBLOCK | CONSOLE_FL_NOECHO), 0);
+  ioctl(0, TIOCNONBLOCK);
+  ioctl(0, TIOCNOECHO);
+  
   
   ANSI_HIDE_CUR;
   ANSI_CLEAR;
 
   do {
     /* !!!!!!! UNCOMMENT THE FOLLOWING LINE TO TEST YOUR ANSWER FOR Q3 !!!!!!!! */  
-    //res = read(0,&in,1);
+    res = read(0,&in,1);
     if (res > 0) {
       switch (in) {
          case 'w':
@@ -65,7 +78,8 @@ main(int argc, char *argv[])
   } while (in != '\n');
 
   /* revert console into the normal mode of operation (blocking line-based input, echoing) */
-  ioctl(0, _IO(CONSOLE_SETFL,0), 0);
+  ioctl(0, TIOCBLOCK);
+  ioctl(0, TIOCECHO);
 
   ANSI_RESET;
   ANSI_CLEAR;

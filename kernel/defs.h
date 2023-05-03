@@ -21,6 +21,7 @@ void            bunpin(struct buf*);
 void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
+int             consoleioctl(int,uint64,int);
 
 // exec.c
 int             exec(char*, char**);
@@ -141,6 +142,8 @@ void            argaddr(int, uint64 *);
 int             fetchstr(uint64, char*, int);
 int             fetchaddr(uint64, uint64*);
 void            syscall();
+int             fileioctl(struct file *f, int);
+int             argint_wrapper(int , int*);
 
 // sem.c 
 void seminit();

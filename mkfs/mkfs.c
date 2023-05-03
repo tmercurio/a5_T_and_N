@@ -1,3 +1,8 @@
+/* 
+    Modified by Nikita Volkov (21393323)
+    Team: T&N
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -10,12 +15,17 @@
 #include "kernel/fs.h"
 #include "kernel/stat.h"
 #include "kernel/param.h"
+#include "kernel/spinlock.h"
+#include "kernel/sleeplock.h"
+#include "kernel/file.h"
+
 
 #ifndef static_assert
 #define static_assert(a, b) do { switch (0) case 0: case (a): ; } while (0)
 #endif
 
 #define NINODES 200
+
 
 // Disk layout:
 // [ boot block | sb block | log | inode blocks | free bit map | data blocks ]
@@ -140,6 +150,7 @@ main(int argc, char *argv[])
     if((fd = open(argv[i], 0)) < 0)
       die(argv[i]);
 
+    
     // Skip leading _ in name when writing to file system.
     // The binaries are named _rm, _cat, etc. to keep the
     // build operating system from trying to execute them
@@ -159,6 +170,21 @@ main(int argc, char *argv[])
 
     close(fd);
   }
+
+  // Create the null device and add it to the root directory
+  inum = ialloc(T_DEVICE);
+  bzero(&de, sizeof(de));
+  de.inum = xshort(inum);
+  strncpy(de.name, "null", DIRSIZ);
+  iappend(rootino, &de, sizeof(de));
+
+  // Write the device information to the inode
+  rinode(inum, &din);
+  din.major = xshort(NULL_DEV);
+  din.minor = xshort(0);
+  din.nlink = xshort(1);
+  din.size = xint(0);
+  winode(inum, &din);
 
   // fix size of root inode dir
   rinode(rootino, &din);

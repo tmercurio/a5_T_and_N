@@ -1,3 +1,8 @@
+/*
+    Modified by: Nikita Volkov (21393323)
+    Team: T&N
+*/
+
 #include "types.h"
 #include "param.h"
 #include "memlayout.h"
@@ -79,6 +84,13 @@ argstr(int n, char *buf, int max)
   return fetchstr(addr, buf, max);
 }
 
+int
+argint_wrapper(int n, int *ip)
+{
+  argint(n, ip);
+  return *ip == -1 ? -1 : 0;
+}
+
 // Prototypes for the functions that handle system calls.
 extern uint64 sys_fork(void);
 extern uint64 sys_exit(void);
@@ -158,3 +170,4 @@ syscall(void)
     p->trapframe->a0 = -1;
   }
 }
+
