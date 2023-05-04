@@ -153,11 +153,14 @@ main(int argc, char *argv[])
      }
   }
 
+  printf("Before waiting\n");
   // wait for the child processes to terminate
   for (i=0; i<M; i++)
   {
      wait(0);
   }
+
+  printf("After waiting\n");
 
   // Closing semaphores at the end when they are not needed anymore
   sem_close(0);
