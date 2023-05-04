@@ -46,6 +46,7 @@ main(int argc, char *argv[])
     int tot_blocks, data_blocks, num_inodes, num_log_blocks, first_log_block;
     int first_inode_block, first_free_map_block;
 
+    // Combination of bit shifting and bitwise or to get the 32-bit uint values together
     tot_blocks = block[4] | (block[5] << 8) | (block[6] << 16) | (block[7] << 24);
     data_blocks = block[8] | (block[9] << 8) | (block[10] << 16) | (block[11] << 24);
     num_inodes = block[12] | (block[13] << 8) | (block[14] << 16) | (block[15] << 24);
@@ -58,18 +59,17 @@ main(int argc, char *argv[])
     putchar('S'); // Superblock that is always second
 
     for (i = 2; i < tot_blocks; i++) {
-        if (i < first_inode_block)
+        if (i < first_inode_block) // After B and S come L's
             putchar('L');
-        else if (i < first_free_map_block)
+        else if (i < first_free_map_block) // Inode data comes next
             putchar('I');
-        else if (i < (tot_blocks - data_blocks))
+        else if (i < (tot_blocks - data_blocks)) // File system bit is after that
             putchar('T');
-        else
+        else // Finally, data blocks are last
             putchar('D');
     }
 
-    putchar('\n');
+    putchar('\n'); // A newline for readability
 
     exit(0);
-    //never gets here
 }
