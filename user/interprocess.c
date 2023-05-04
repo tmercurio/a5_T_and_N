@@ -103,7 +103,7 @@ void worker(int sem)
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
 
-    printf("Process %d got value %d\n", i, sem);
+    printf("Process %d got value %d\n", sem, i);
 
 	// --------- do not modify the increment loop  --------
 	for (int j=0; j <100000; j++)
@@ -119,7 +119,7 @@ void worker(int sem)
    }
 
    //sem_post((sem + 1) % M, 1);
-   printf("Waiting to exit\n");
+   printf("Waiting to exit process %d\n", sem);
 
    exit(0);
 }
