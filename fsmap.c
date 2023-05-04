@@ -1,3 +1,8 @@
+// fsmap.c
+// Thomas Mercurio (22209849) and Nick Volkov (21393323)
+// Code given in Pavel Gladyshev's class and built off of for Question 4 of
+// Assignment 5
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -43,6 +48,7 @@ main(int argc, char *argv[])
         fprintf(stderr,"Cannot read the entire block %d\n",blockNo);
     }
 
+    // ints to store the needed values
     int tot_blocks, data_blocks, num_inodes, num_log_blocks, first_log_block;
     int first_inode_block, first_free_map_block;
 

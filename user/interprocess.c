@@ -1,3 +1,8 @@
+// interprocess.c
+// Thomas Mercurio (22209849) and Nick Volkov (21393323)
+// Code given in Pavel Gladyshev's class and built off of for Question 3 of
+// Assignment 5
+
 #include "kernel/types.h"
 #include "kernel/riscv.h"
 #include "kernel/memlayout.h"
@@ -69,6 +74,7 @@ volatile struct shared_space *s = (volatile struct shared_space*) 0x3FFFFFD000;
 // This method gets the next piece of data to be processed
 int get_item(int sem)
 {
+   // Line added to protect data from being accessed by multiple processes
    sem_wait(sem, 1);
 
    int i;
@@ -77,7 +83,7 @@ int get_item(int sem)
    {
       if (s->a[i].processed == 0)
       {
-	 break;
+	      break;
       }
    }
 
@@ -94,33 +100,24 @@ void worker(int sem)
 {
    int i;
 
-   printf("In worker process\n");
-
-   // Line added to protect data from being accessed by multiple processes
-   //sem_wait(sem, 1);
-
    for(i = get_item(sem); i>=0; i = get_item(sem))
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
-
-    printf("Process %d got value %d\n", sem, i);
 
 	// --------- do not modify the increment loop  --------
 	for (int j=0; j <100000; j++)
 	{
 	   s->a[i].value++;
-       if (j == 99999)
-        printf("Value %d processed by process %d\n", i, sem);
 	}
 	// ---------------------------------------------------
 
 	s->a[i].processed = 1;
+    // Call post to free up next process to process next array element
     sem_post((sem + 1) % M, 1);
    }
 
-   //if (sem != 0)
+   // Wake up other processes for them to exit
    sem_post((sem + 1) % M, 1);
-   printf("Waiting to exit process %d\n", sem);
 
    exit(0);
 }
@@ -145,23 +142,18 @@ main(int argc, char *argv[])
 
   // create worker processes
   printf("Creating worker processes ...\n");
-  for (i = 0; i<M; i++)
+  for (i = 0; i < M; i++)
   {
      if (fork() == 0) {
-         printf("Process %d starting\n", i);
          worker(i); // start worker process
-         printf("Process %d finished\n", i);
      }
   }
 
-  printf("Before waiting\n");
   // wait for the child processes to terminate
   for (i=0; i<M; i++)
   {
      wait(0);
   }
-
-  printf("After waiting\n");
 
   // Closing semaphores at the end when they are not needed anymore
   sem_close(0);
