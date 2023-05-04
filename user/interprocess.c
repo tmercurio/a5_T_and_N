@@ -103,6 +103,7 @@ void worker(int sem)
    {
 	// process i-th element of the array a[] by incrementing it 100000 times.
 
+    printf("Process %d got value %d\n", i, sem);
 
 	// --------- do not modify the increment loop  --------
 	for (int j=0; j <100000; j++)
