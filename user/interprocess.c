@@ -118,8 +118,8 @@ void worker(int sem)
     sem_post((sem + 1) % M, 1);
    }
 
-   if (sem != 0)
-    sem_post((sem + 1) % M, 1);
+   //if (sem != 0)
+   sem_post((sem + 1) % M, 1);
    printf("Waiting to exit process %d\n", sem);
 
    exit(0);
